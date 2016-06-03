@@ -1,3 +1,4 @@
+import os
 import requests
 import requests.auth
 import unicodedata as uni
