@@ -110,7 +110,7 @@ for mention in reddit.get_mentions():
 		break
 	
 	if mention.is_root:
-		if mention.is_root:
+		if mention.submission.is_self:
 			source_text = mention.submission.selftext
 		else:
 			source_text = mention.submission.title
