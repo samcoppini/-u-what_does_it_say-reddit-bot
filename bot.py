@@ -48,10 +48,12 @@ def get_name(c):
 
 #Escapes a character, so it'll appear and not mess up the formatting
 def escape(c):
-	if c in r'\!#&()*+-./:<>[\]^_`{|}~':
+	if c in r'\!#&()*+-./:<>[\]^_`{}~':
 		return '\\' + c #May not appear in comment due to markdown
 	elif c == '\n':
 		return ' ' #Messes up table formatting otherwise
+	elif c == '|':
+		return '&#124;' # Reddit doesn't escape vertical lines in tables properly
 	else:
 		return c
 	
