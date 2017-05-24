@@ -56,7 +56,7 @@ def escape(c):
 		return '&#124;' # Reddit doesn't escape vertical lines in tables properly
 	else:
 		return c
-	
+
 #Returns a list of comments which contain the table of information
 def make_output(str):
 	TABLE_HEADING = 'Character|Name|Category\n---------|----|--------\n'
@@ -71,7 +71,7 @@ def make_output(str):
 		messages[-1] += new_row
 	messages[-1] += TABLE_POSTSCRIPT
 	return messages
-	
+
 #Uses the given information to return a logged-in instance
 def login(username, password, user_agent, id, secret, scope={'identity'}):
 	reddit = Reddit(user_agent)
@@ -100,17 +100,23 @@ reddit = login(REDDIT_USERNAME, REDDIT_PASSWORD, REDDIT_USER_AGENT,
                REDDIT_ID, REDDIT_SECRET, {'identity', 'privatemessages', 'submit'})
 
 for mention in reddit.get_mentions():
+	if mention.author.name == "AutoModerator":
+		# Prevent abuse from /r/doctorbutts, a subreddit that set their automod
+		# to automatically summon /u/what_does_it_say in response to every
+		# single comment on that subreddit
+		continue
+
 	already_responded = False
 	for reply in mention.replies:
 		if reply.author.name == REDDIT_USERNAME:
 			already_responded = True
 			break
-			
+
 	if already_responded:
 		#If we find that already responded to this username mention, we can
 		#just exit out of the script
 		break
-	
+
 	if mention.is_root:
 		if mention.submission.is_self:
 			source_text = mention.submission.selftext
@@ -123,9 +129,9 @@ for mention in reddit.get_mentions():
 			continue
 		else:
 			source_text = source_comment.body
-	
+
 	comments = make_output(source_text)
-	
+
 	reply_to = mention
 	while comments:
 		reply_to = reply_to.reply(comments[0])
