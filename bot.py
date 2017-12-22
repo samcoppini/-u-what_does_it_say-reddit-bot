@@ -111,7 +111,7 @@ for mention in reddit.inbox.mentions():
 		else:
 			source_text = mention.submission.title
 	else:
-		source_text = source_comment.body
+		source_text = mention.parent().body
 
 	comments = make_output(source_text)
 
