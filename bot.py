@@ -72,21 +72,6 @@ def make_output(str):
 	messages[-1] += TABLE_POSTSCRIPT
 	return messages
 
-#Uses the given information to return a logged-in instance
-def login(username, password, user_agent, id, secret, scope={'identity'}):
-	reddit = Reddit(user_agent)
-	client_auth = requests.auth.HTTPBasicAuth(id, secret)
-	post_data = {'grant_type': 'password',
-	             'username': username,
-	             'password': password}
-	headers = {'User-agent': user_agent}
-	response = requests.post('https://www.reddit.com/api/v1/access_token',
-	                         auth=client_auth, data=post_data, headers=headers)
-	cred = response.json()
-	reddit.set_oauth_app_info(client_id=id, client_secret=secret, redirect_uri=URI)
-	reddit.set_access_credentials(scope=scope, access_token=cred['access_token'])
-	return reddit
-
 REDDIT_USERNAME = os.getenv('USERNAME')
 REDDIT_PASSWORD = os.getenv('PASSWORD')
 REDDIT_ID = os.getenv('REDDIT_ID')
@@ -96,10 +81,13 @@ REDDIT_USER_AGENT = 'A bot written by /u/sirgroovy that, when summoned, tabulate
 MAX_MESSAGE_LENGTH = 10000
 URI = 'http://127.0.0.1:65010/authorize_callback'
 
-reddit = login(REDDIT_USERNAME, REDDIT_PASSWORD, REDDIT_USER_AGENT,
-               REDDIT_ID, REDDIT_SECRET, {'identity', 'privatemessages', 'submit'})
+reddit = Reddit(client_id=REDDIT_ID,
+                client_secret=REDDIT_SECRET,
+                user_agent=REDDIT_USER_AGENT,
+                username=REDDIT_USERNAME,
+                password=REDDIT_PASSWORD)
 
-for mention in reddit.get_mentions():
+for mention in reddit.inbox.mentions():
 	if mention.author.name == "AutoModerator":
 		# Prevent abuse from /r/doctorbutts, a subreddit that set their automod
 		# to automatically summon /u/what_does_it_say in response to every
@@ -118,7 +106,7 @@ for mention in reddit.get_mentions():
 		break
 
 	if mention.is_root:
-		if mention.submission.is_self:
+		if mention.submission.is_self and len(mention.submission.selftext) > 0:
 			source_text = mention.submission.selftext
 		else:
 			source_text = mention.submission.title
