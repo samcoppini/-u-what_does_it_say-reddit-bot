@@ -94,6 +94,9 @@ for mention in reddit.inbox.mentions():
 		# single comment on that subreddit
 		continue
 
+    # Retrieve replies for the comment
+    mention.refresh()
+
 	already_responded = False
 	for reply in mention.replies:
 		if reply.author.name == REDDIT_USERNAME:
