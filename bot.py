@@ -111,12 +111,7 @@ for mention in reddit.inbox.mentions():
 		else:
 			source_text = mention.submission.title
 	else:
-		source_comment = reddit.get_info(thing_id=mention.parent_id)
-		if source_comment.author.name == REDDIT_USERNAME:
-			mention.reply("I think you already know quite well what that says.")
-			continue
-		else:
-			source_text = source_comment.body
+		source_text = source_comment.body
 
 	comments = make_output(source_text)
 
